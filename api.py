@@ -22,3 +22,13 @@ with connection.cursor() as cursor:
         )
     """)
     connection.commit()
+
+#Return video by id
+@app.route('/video/<int:video_id>', methods=['GET'])
+def get_video(video_id): 
+    with connection.cursor() as cursor: 
+        cursor.execute('SELECT * FROM videos WHERE id = %s', (video_id,)) # (video_id,) is a tuple
+        video = cursor.fetchone() # fetchone() is a method that returns the first row of the result
+    if not video:
+        return jsonify({'message': 'Video not found'}), 404
+    return jsonify({'id': video[0], 'name': video[1], 'views': video[2], 'likes': video[3]})
