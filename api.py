@@ -32,3 +32,13 @@ def get_video(video_id):
     if not video:
         return jsonify({'message': 'Video not found'}), 404
     return jsonify({'id': video[0], 'name': video[1], 'views': video[2], 'likes': video[3]})
+
+#Create video by id
+@app.route('/video/<int:video_id>', methods=['POST'])
+def create_video(video_id):
+    data = request.get_json()
+    with connection.cursor() as cursor:
+        cursor.execute('INSERT INTO videos (id, name, views, likes) VALUES (%s, %s, %s, %s)',
+                       (video_id, data['name'], data['views'], data['likes']))
+        connection.commit()
+    return jsonify({'message': 'Video created successfully'}), 201
