@@ -18,6 +18,7 @@ with connection.cursor() as cursor:
         CREATE TABLE IF NOT EXISTS videos (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
+            description TEXT,
             views INT NOT NULL,
             likes INT NOT NULL
         )
@@ -27,15 +28,16 @@ with connection.cursor() as cursor:
 # Classe de formulário para validação
 class VideoForm(Form):
     name = StringField('name', [validators.Length(min=1, max=100)])
+    description = StringField('description')
     views = StringField('views', [validators.NumberRange(min=0)])
     likes = StringField('likes', [validators.NumberRange(min=0)])
 
 # Validate form
 def validate_form(form):
-    if form.validate():
+    if form.validate(): # Verifica se o formulário é válido
         return True
     else:
-        errors = {field.label.text: field.errors for field in form}
+        errors = {field.label.text: field.errors for field in form} # Cria um dicionário com os erros
         return jsonify({'message': 'Invalid input', 'errors': errors}), 400  # Bad Request
 
 #Return video by id
