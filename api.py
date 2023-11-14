@@ -43,15 +43,21 @@ def create_video(video_id):
         connection.commit()
     return jsonify({'message': 'Video created successfully'}), 201
 
+# Update video by id
 @app.route('/video/<int:video_id>', methods=['PATCH'])
 def update_video(video_id):
     data = request.get_json()
     with connection.cursor() as cursor:
-        cursor.execute('UPDATE videos SET name = %s, views = %s, likes = %s WHERE id = %s',
-                       (data.get('name'), data.get('views'), data.get('likes'), video_id))
+        # Atualiza apenas as informações fornecidas no JSON
+        update_query = 'UPDATE videos SET '
+        update_query += ', '.join(f'{key} = %s' for key, value in data.items())
+        update_query += ' WHERE id = %s'
+
+        cursor.execute(update_query, [value for key, value in data.items()] + [video_id])
         connection.commit()
     return jsonify({'message': 'Video updated successfully'})
 
+# Delete video by id
 @app.route('/video/<int:video_id>', methods=['DELETE'])
 def delete_video(video_id):
     with connection.cursor() as cursor:
