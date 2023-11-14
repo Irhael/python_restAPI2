@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, escape
 import mysql.connector
+from wtforms import Form, StringField, validators
 
 app = Flask(__name__)
 
@@ -22,6 +23,12 @@ with connection.cursor() as cursor:
         )
     """)
     connection.commit()
+
+# Classe de formulário para validação
+class VideoForm(Form):
+    name = StringField('name', [validators.Length(min=1, max=100)])
+    views = StringField('views', [validators.NumberRange(min=0)])
+    likes = StringField('likes', [validators.NumberRange(min=0)])
 
 #Return video by id
 @app.route('/video/<int:video_id>', methods=['GET'])
