@@ -51,3 +51,10 @@ def update_video(video_id):
                        (data.get('name'), data.get('views'), data.get('likes'), video_id))
         connection.commit()
     return jsonify({'message': 'Video updated successfully'})
+
+@app.route('/video/<int:video_id>', methods=['DELETE'])
+def delete_video(video_id):
+    with connection.cursor() as cursor:
+        cursor.execute('DELETE FROM videos WHERE id = %s', (video_id,))
+        connection.commit()
+    return jsonify({'message': 'Video deleted successfully'})
