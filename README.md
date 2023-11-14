@@ -1,4 +1,5 @@
 # python_rest_API2
+Fiz essa API para aprimorar minhas skills em SQL, Python e Requisições Http/ Métodos CRUD
 
 Este código é uma aplicação simples em Flask para gerenciar informações sobre vídeos. Ele utiliza um banco de dados MySQL para armazenar dados como nome, descrição, visualizações e curtidas de vídeos. Aqui estão alguns pontos-chave sobre o código:
 
