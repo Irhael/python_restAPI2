@@ -60,7 +60,21 @@ def update_video(video_id):
 # Delete video by id
 @app.route('/video/<int:video_id>', methods=['DELETE'])
 def delete_video(video_id):
+    data = request.get_json()
+    
     with connection.cursor() as cursor:
-        cursor.execute('DELETE FROM videos WHERE id = %s', (video_id,))
+        # Verifica se o vídeo existe
+        cursor.execute('SELECT * FROM videos WHERE id = %s', (video_id,))
+        video = cursor.fetchone()
+        if not video:
+            return jsonify({'message': 'Video not found'}), 404
+        
+        # Atualiza apenas as informações fornecidas no JSON
+        update_query = 'UPDATE videos SET '
+        update_query += ', '.join(f'{key} = NULL' for key in data.keys())
+        update_query += ' WHERE id = %s'
+
+        cursor.execute(update_query, [video_id])
         connection.commit()
-    return jsonify({'message': 'Video deleted successfully'})
+
+    return jsonify({'message': f'Specific parts of Video with ID {video_id} deleted successfully'})
