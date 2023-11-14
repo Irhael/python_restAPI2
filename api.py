@@ -30,6 +30,14 @@ class VideoForm(Form):
     views = StringField('views', [validators.NumberRange(min=0)])
     likes = StringField('likes', [validators.NumberRange(min=0)])
 
+# Função auxiliar para validar o formulário
+def validate_form(form):
+    if form.validate():
+        return True
+    else:
+        errors = {field.label.text: field.errors for field in form}
+        return jsonify({'message': 'Invalid input', 'errors': errors}), 400  # Bad Request
+
 #Return video by id
 @app.route('/video/<int:video_id>', methods=['GET'])
 def get_video(video_id): 
