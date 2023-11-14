@@ -48,8 +48,14 @@ def get_video(video_id):
         video = cursor.fetchone() # fetchone() is a method that returns the first row of the result
     if not video:
         return jsonify({'message': 'Video not found'}), 404
-    return jsonify({'id': video[0], 'name': video[1], 'views': video[2], 'likes': video[3]})
-
+    video_data = {
+        'id': video[0],
+        'name': video[1],
+        'description': video[2],
+        'views': video[3],
+        'likes': video[4]
+    }
+    return jsonify(video_data)
 #Create video by id
 @app.route('/video/<int:video_id>', methods=['POST'])
 def create_video(video_id):
@@ -60,8 +66,8 @@ def create_video(video_id):
         return validate_form(form)
     
     with connection.cursor() as cursor:
-        cursor.execute('INSERT INTO videos (id, name, views, likes) VALUES (%s, %s, %s, %s)',
-                       (video_id, data['name'], data['views'], data['likes']))
+        cursor.execute('INSERT INTO videos (id, name, description, views, likes) VALUES (%s, %s, %s, %s, %s)',
+                       (video_id, form.name.data, form.description.data, form.views.data, form.likes.data))
         connection.commit()
     return jsonify({'message': 'Video created successfully'}), 201
 
@@ -69,12 +75,11 @@ def create_video(video_id):
 @app.route('/video/<int:video_id>', methods=['PATCH'])
 def update_video(video_id):
     data = request.get_json()
-
     form = VideoForm(data=data)
 
     if not validate_form(form):
         return validate_form(form)
-    
+
     with connection.cursor() as cursor:
         # Atualiza apenas as informações fornecidas no JSON
         update_query = 'UPDATE videos SET '
@@ -89,15 +94,15 @@ def update_video(video_id):
 @app.route('/video/<int:video_id>', methods=['DELETE'])
 def delete_video(video_id):
     data = request.get_json()
-    
+
     with connection.cursor() as cursor:
         # Verifica se o vídeo existe
         cursor.execute('SELECT * FROM videos WHERE id = %s', (video_id,))
         video = cursor.fetchone()
         if not video:
             return jsonify({'message': 'Video not found'}), 404
-        
-        # Atualiza apenas as informações fornecidas no JSON
+
+        # Atualiza apenas as informações fornecidas no JSON para NULL
         update_query = 'UPDATE videos SET '
         update_query += ', '.join(f'{key} = NULL' for key in data.keys())
         update_query += ' WHERE id = %s'
@@ -106,3 +111,6 @@ def delete_video(video_id):
         connection.commit()
 
     return jsonify({'message': f'Specific parts of Video with ID {video_id} deleted successfully'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
