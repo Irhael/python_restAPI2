@@ -42,3 +42,12 @@ def create_video(video_id):
                        (video_id, data['name'], data['views'], data['likes']))
         connection.commit()
     return jsonify({'message': 'Video created successfully'}), 201
+
+@app.route('/video/<int:video_id>', methods=['PATCH'])
+def update_video(video_id):
+    data = request.get_json()
+    with connection.cursor() as cursor:
+        cursor.execute('UPDATE videos SET name = %s, views = %s, likes = %s WHERE id = %s',
+                       (data.get('name'), data.get('views'), data.get('likes'), video_id))
+        connection.commit()
+    return jsonify({'message': 'Video updated successfully'})
