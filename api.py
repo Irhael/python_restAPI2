@@ -83,10 +83,10 @@ def update_video(video_id):
     with connection.cursor() as cursor:
         # Atualiza apenas as informações fornecidas no JSON
         update_query = 'UPDATE videos SET '
-        update_query += ', '.join(f'{key} = %s' for key, value in data.items())
+        update_query += ', '.join(f'{key} = %s' for key, value in data.items() if value is not None)
         update_query += ' WHERE id = %s'
 
-        cursor.execute(update_query, [value for key, value in data.items()] + [video_id])
+        cursor.execute(update_query, [value for key, value in data.items() if value is not None] + [video_id])
         connection.commit()
     return jsonify({'message': 'Video updated successfully'})
 
