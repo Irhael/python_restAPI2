@@ -30,7 +30,7 @@ class VideoForm(Form):
     views = StringField('views', [validators.NumberRange(min=0)])
     likes = StringField('likes', [validators.NumberRange(min=0)])
 
-# Função auxiliar para validar o formulário
+# Validate form
 def validate_form(form):
     if form.validate():
         return True
@@ -52,6 +52,11 @@ def get_video(video_id):
 @app.route('/video/<int:video_id>', methods=['POST'])
 def create_video(video_id):
     data = request.get_json()
+    form = VideoForm(data=data) # Instancia o formulário com os dados do JSON
+
+    if not validate_form(form):  # Validating form
+        return validate_form(form)
+    
     with connection.cursor() as cursor:
         cursor.execute('INSERT INTO videos (id, name, views, likes) VALUES (%s, %s, %s, %s)',
                        (video_id, data['name'], data['views'], data['likes']))
@@ -62,6 +67,12 @@ def create_video(video_id):
 @app.route('/video/<int:video_id>', methods=['PATCH'])
 def update_video(video_id):
     data = request.get_json()
+
+    form = VideoForm(data=data)
+
+    if not validate_form(form):
+        return validate_form(form)
+    
     with connection.cursor() as cursor:
         # Atualiza apenas as informações fornecidas no JSON
         update_query = 'UPDATE videos SET '
